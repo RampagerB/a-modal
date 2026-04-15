@@ -76,6 +76,7 @@ function setupModal() {
     <div id="modal-link-opener-content">
       <iframe width="100%" height="100%" id="modal-link-opener-iframe" loading="lazy" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen" sandbox="allow-scripts allow-same-origin" referrerpolicy="same-origin" importance="high" src=""></iframe>
     </div>
+    <div id="modal-link-opener-toast" class="toast"></div>
   `;
   document.body.appendChild(modalContainer);
 
@@ -106,6 +107,18 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
+// 显示 toast 提示
+function showToast(message) {
+  const toast = document.getElementById('modal-link-opener-toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  
+  // 3 秒后自动消失
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
 // 复制网址
 function copyUrl() {
   const lang = getSystemLanguage();
@@ -115,10 +128,10 @@ function copyUrl() {
   
   if (url) {
     navigator.clipboard.writeText(url).then(() => {
-      alert(translation.copySuccess);
+      showToast(translation.copySuccess);
     }).catch(err => {
       console.error('复制失败:', err);
-      alert(translation.copyFailed);
+      showToast(translation.copyFailed);
     });
   }
 }

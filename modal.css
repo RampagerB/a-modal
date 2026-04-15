@@ -91,3 +91,25 @@
   will-change: transform;
   transform: translateZ(0);
 }
+
+/* Toast 提示样式 */
+#modal-link-opener-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 10002;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+#modal-link-opener-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}

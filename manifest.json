@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "A Modal",
   "version": "1.0",
-  "description": "Intercepts links on whitelisted domains and opens them in a modal",
+  "description": "A browser extension that intercepts link clicks and displays them in a modal window. / 一个浏览器插件，用于拦截链接点击并在模态窗口中显示链接内容。",
   "permissions": [
     "activeTab",
     "storage",
@@ -21,14 +21,16 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icon16.png",
-      "48": "icon48.png",
-      "128": "icon128.png"
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
     }
   },
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }

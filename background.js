@@ -1,46 +1,46 @@
-// 初始化黑名单存储
+// 初始化排除名单存储
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.set({ blacklist: [] });
+  chrome.storage.local.set({ exclusionList: [] });
 });
 
 // 处理来自 popup 和 content script 的消息
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.action) {
-    case 'getBlacklist':
-      chrome.storage.local.get('blacklist', (result) => {
-        sendResponse({ blacklist: result.blacklist || [] });
+    case 'getExclusionList':
+      chrome.storage.local.get('exclusionList', (result) => {
+        sendResponse({ exclusionList: result.exclusionList || [] });
       });
       return true;
     
-    case 'addToBlacklist':
-      chrome.storage.local.get('blacklist', (result) => {
-        const blacklist = result.blacklist || [];
-        if (!blacklist.includes(message.domain)) {
-          blacklist.push(message.domain);
-          chrome.storage.local.set({ blacklist }, () => {
+    case 'addToExclusionList':
+      chrome.storage.local.get('exclusionList', (result) => {
+        const exclusionList = result.exclusionList || [];
+        if (!exclusionList.includes(message.domain)) {
+          exclusionList.push(message.domain);
+          chrome.storage.local.set({ exclusionList }, () => {
             sendResponse({ success: true });
           });
         } else {
-          sendResponse({ success: false, message: 'Domain already in blacklist' });
+          sendResponse({ success: false, message: 'Domain already in exclusion list' });
         }
       });
       return true;
     
-    case 'removeFromBlacklist':
-      chrome.storage.local.get('blacklist', (result) => {
-        const blacklist = result.blacklist || [];
-        const updatedBlacklist = blacklist.filter(domain => domain !== message.domain);
-        chrome.storage.local.set({ blacklist: updatedBlacklist }, () => {
+    case 'removeFromExclusionList':
+      chrome.storage.local.get('exclusionList', (result) => {
+        const exclusionList = result.exclusionList || [];
+        const updatedExclusionList = exclusionList.filter(domain => domain !== message.domain);
+        chrome.storage.local.set({ exclusionList: updatedExclusionList }, () => {
           sendResponse({ success: true });
         });
       });
       return true;
     
-    case 'checkBlacklist':
-      chrome.storage.local.get('blacklist', (result) => {
-        const blacklist = result.blacklist || [];
-        const isBlacklisted = blacklist.some(domain => message.url.includes(domain));
-        sendResponse({ isBlacklisted });
+    case 'checkExclusionList':
+      chrome.storage.local.get('exclusionList', (result) => {
+        const exclusionList = result.exclusionList || [];
+        const isExcluded = exclusionList.some(domain => message.url.includes(domain));
+        sendResponse({ isExcluded });
       });
       return true;
   }

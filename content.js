@@ -22,22 +22,22 @@ function getSystemLanguage() {
   return language.startsWith('zh') ? 'zh' : 'en';
 }
 
-// 获取当前页面是否在黑名单中
-let isBlacklisted = false;
+// 获取当前页面是否在排除名单中
+let isExcluded = false;
 
 // 初始化
 function init() {
-  checkBlacklist();
+  checkExclusionList();
   setupModal();
 }
 
-// 检查当前域名是否在黑名单中
-function checkBlacklist() {
+// 检查当前域名是否在排除名单中
+function checkExclusionList() {
   chrome.runtime.sendMessage(
-    { action: 'checkBlacklist', url: window.location.href },
+    { action: 'checkExclusionList', url: window.location.href },
     (response) => {
-      isBlacklisted = response.isBlacklisted;
-      if (!isBlacklisted) {
+      isExcluded = response.isExcluded;
+      if (!isExcluded) {
         setupLinkInterceptors();
       }
     }

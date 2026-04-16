@@ -1,19 +1,19 @@
 // 语言配置
 const translations = {
   en: {
-    extensionTitle: "Modal Link Opener",
+    extensionTitle: "A Modal",
     domainLabel: "Current domain:",
-    toggleLabel: "Add to blacklist",
-    listTitle: "Blacklisted domains",
-    noDomains: "No blacklisted domains",
+    toggleLabel: "Add to exclusion list",
+    listTitle: "Excluded domains",
+    noDomains: "No excluded domains",
     removeBtn: "Remove"
   },
   zh: {
-    extensionTitle: "Modal 链接 opener",
+    extensionTitle: "A Modal",
     domainLabel: "当前域名:",
-    toggleLabel: "添加到黑名单",
-    listTitle: "黑名单域名",
-    noDomains: "暂无黑名单域名",
+    toggleLabel: "添加到排除名单",
+    listTitle: "排除名单域名",
+    noDomains: "暂无排除名单域名",
     removeBtn: "移除"
   }
 };
@@ -40,9 +40,9 @@ function updateLanguage() {
   });
   
   // 更新无域名提示
-  const blacklistList = document.getElementById('whitelist-list');
-  if (blacklistList.innerHTML.includes('暂无黑名单域名') || blacklistList.innerHTML.includes('No blacklisted domains')) {
-    blacklistList.innerHTML = `<div style="color: #999; font-style: italic;">${translation.noDomains}</div>`;
+  const exclusionList = document.getElementById('exclusion-list');
+  if (exclusionList.innerHTML.includes('暂无黑名单域名') || exclusionList.innerHTML.includes('No blacklisted domains')) {
+    exclusionList.innerHTML = `<div style="color: #999; font-style: italic;">${translation.noDomains}</div>`;
   }
 }
 
@@ -60,63 +60,63 @@ function getCurrentDomain() {
   });
 }
 
-// 获取黑名单
-function getBlacklist() {
+// 获取排除名单
+function getExclusionList() {
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ action: 'getBlacklist' }, (response) => {
-      resolve(response.blacklist || []);
+    chrome.runtime.sendMessage({ action: 'getExclusionList' }, (response) => {
+      resolve(response.exclusionList || []);
     });
   });
 }
 
-// 添加到黑名单
-function addToBlacklist(domain) {
+// 添加到排除名单
+function addToExclusionList(domain) {
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ action: 'addToBlacklist', domain }, (response) => {
+    chrome.runtime.sendMessage({ action: 'addToExclusionList', domain }, (response) => {
       resolve(response.success);
     });
   });
 }
 
-// 从黑名单移除
-function removeFromBlacklist(domain) {
+// 从排除名单移除
+function removeFromExclusionList(domain) {
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ action: 'removeFromBlacklist', domain }, (response) => {
+    chrome.runtime.sendMessage({ action: 'removeFromExclusionList', domain }, (response) => {
       resolve(response.success);
     });
   });
 }
 
-// 渲染黑名单列表
-async function renderBlacklist() {
-  const blacklist = await getBlacklist();
-  const blacklistList = document.getElementById('whitelist-list');
+// 渲染排除名单列表
+async function renderExclusionList() {
+  const exclusionList = await getExclusionList();
+  const exclusionListElement = document.getElementById('exclusion-list');
   const lang = getSystemLanguage();
   const translation = translations[lang] || translations.en;
   
-  if (blacklist.length === 0) {
-    blacklistList.innerHTML = `<div style="color: #999; font-style: italic;">${translation.noDomains}</div>`;
+  if (exclusionList.length === 0) {
+    exclusionListElement.innerHTML = `<div style="color: #999; font-style: italic;">${translation.noDomains}</div>`;
     return;
   }
   
-  blacklistList.innerHTML = '';
+  exclusionListElement.innerHTML = '';
   
-  blacklist.forEach(domain => {
+  exclusionList.forEach(domain => {
     const item = document.createElement('div');
-    item.className = 'whitelist-item';
+    item.className = 'exclusion-item';
     item.innerHTML = `
       <span>${domain}</span>
       <button class="remove-btn" data-domain="${domain}" title="${translation.removeBtn}"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg></button>
     `;
-    blacklistList.appendChild(item);
+    exclusionListElement.appendChild(item);
   });
   
   // 绑定移除按钮事件
   document.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const domain = e.target.dataset.domain;
-      await removeFromBlacklist(domain);
-      await renderBlacklist();
+      await removeFromExclusionList(domain);
+      await renderExclusionList();
       await updateToggleState();
     });
   });
@@ -125,10 +125,10 @@ async function renderBlacklist() {
 // 更新 toggle 状态
 async function updateToggleState() {
   const currentDomain = await getCurrentDomain();
-  const blacklist = await getBlacklist();
-  const toggle = document.getElementById('whitelist-toggle');
+  const exclusionList = await getExclusionList();
+  const toggle = document.getElementById('exclusion-toggle');
   
-  toggle.checked = blacklist.includes(currentDomain);
+  toggle.checked = exclusionList.includes(currentDomain);
 }
 
 // 初始化
@@ -137,18 +137,18 @@ async function init() {
   document.getElementById('current-domain').textContent = currentDomain;
   
   updateLanguage();
-  await renderBlacklist();
+  await renderExclusionList();
   await updateToggleState();
   
   // 绑定 toggle 事件
-  document.getElementById('whitelist-toggle').addEventListener('change', async (e) => {
+  document.getElementById('exclusion-toggle').addEventListener('change', async (e) => {
     const currentDomain = await getCurrentDomain();
     if (e.target.checked) {
-      await addToBlacklist(currentDomain);
+      await addToExclusionList(currentDomain);
     } else {
-      await removeFromBlacklist(currentDomain);
+      await removeFromExclusionList(currentDomain);
     }
-    await renderBlacklist();
+    await renderExclusionList();
   });
 }
 

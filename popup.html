@@ -63,14 +63,14 @@
     input:checked + .slider:before {
       transform: translateX(26px);
     }
-    .whitelist-section {
+    .exclusion-section {
       margin-top: 10px;
     }
-    .whitelist-title {
+    .exclusion-title {
       font-weight: bold;
       margin-bottom: 10px;
     }
-    .whitelist-item {
+    .exclusion-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -98,15 +98,15 @@
       <div id="domain-label">当前域名: <span id="current-domain"></span></div>
     </div>
     <div class="toggle-container">
-      <span id="toggle-label">添加到黑名单</span>
+      <span id="toggle-label">添加到排除名单</span>
       <label class="toggle">
-        <input type="checkbox" id="whitelist-toggle">
+        <input type="checkbox" id="exclusion-toggle">
         <span class="slider"></span>
       </label>
     </div>
-    <div class="whitelist-section">
-      <div id="list-title" class="whitelist-title">黑名单域名</div>
-      <div id="whitelist-list"></div>
+    <div class="exclusion-section">
+      <div id="list-title" class="exclusion-title">排除名单域名</div>
+      <div id="exclusion-list"></div>
     </div>
   </div>
   <script src="popup.js"></script>

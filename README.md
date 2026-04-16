@@ -1,4 +1,4 @@
-# Modal Link Opener / Modal 链接开启器
+# A Modal
 
 A Chromium browser extension that intercepts link clicks and displays them in a modal window inspired by Arc Browser. / 一个 Chromium 浏览器插件，用于拦截链接点击并在模态窗口中显示链接内容，灵感来源于 Arc Browser。
 

@@ -19,6 +19,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           exclusionList.push(message.domain);
           chrome.storage.local.set({ exclusionList }, () => {
             sendResponse({ success: true });
+            // 通知所有标签页排除名单已更新
+            notifyTabsOfExclusionListChange();
           });
         } else {
           sendResponse({ success: false, message: 'Domain already in exclusion list' });
@@ -32,6 +34,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const updatedExclusionList = exclusionList.filter(domain => domain !== message.domain);
         chrome.storage.local.set({ exclusionList: updatedExclusionList }, () => {
           sendResponse({ success: true });
+          // 通知所有标签页排除名单已更新
+          notifyTabsOfExclusionListChange();
         });
       });
       return true;
@@ -45,3 +49,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true;
   }
 });
+
+// 通知所有标签页排除名单已更新
+function notifyTabsOfExclusionListChange() {
+  chrome.tabs.query({}, (tabs) => {
+    tabs.forEach(tab => {
+      if (tab.url && tab.url.startsWith('http')) {
+        chrome.tabs.sendMessage(tab.id, { action: 'exclusionListUpdated' });
+      }
+    });
+  });
+}

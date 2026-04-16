@@ -44,8 +44,13 @@ function checkExclusionList() {
         setupLinkInterceptors();
       } else if (isExcluded && !wasExcluded) {
         // 添加到排除名单，需要移除链接拦截器
-        // 注意：由于我们使用的是事件委托，无法直接移除监听器
-        // 但由于 isExcluded 为 true，拦截器会自动不工作
+        document.removeEventListener('click', handleLinkClick);
+      } else if (!isExcluded && !wasExcluded) {
+        // 保持不在排除名单中，确保链接拦截器已添加
+        setupLinkInterceptors();
+      } else if (isExcluded && wasExcluded) {
+        // 保持在排除名单中，确保链接拦截器已移除
+        document.removeEventListener('click', handleLinkClick);
       }
     }
   );
@@ -53,20 +58,26 @@ function checkExclusionList() {
 
 // 设置链接拦截器
 function setupLinkInterceptors() {
-  document.addEventListener('click', (e) => {
-    // 如果当前域名在排除名单中，不拦截链接
-    if (isExcluded) return;
-    
-    const link = e.target.closest('a');
-    if (link && link.href) {
-      // 检查是否是在新标签页打开的链接
-      if (link.target === '_blank' || e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        e.stopPropagation();
-        showModal(link.href);
-      }
+  // 移除可能存在的旧监听器
+  document.removeEventListener('click', handleLinkClick);
+  // 添加新的监听器
+  document.addEventListener('click', handleLinkClick);
+}
+
+// 处理链接点击
+function handleLinkClick(e) {
+  // 如果当前域名在排除名单中，不拦截链接
+  if (isExcluded) return;
+  
+  const link = e.target.closest('a');
+  if (link && link.href) {
+    // 检查是否是在新标签页打开的链接
+    if (link.target === '_blank' || e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      showModal(link.href);
     }
-  });
+  }
 }
 
 // 设置 modal 结构
@@ -163,6 +174,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'exclusionListUpdated') {
     // 重新检查当前域名是否在排除名单中
     checkExclusionList();
+    sendResponse({ received: true });
   }
 });
 
